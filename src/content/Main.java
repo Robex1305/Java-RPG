@@ -6,19 +6,33 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class Main extends Application {
+
+    private static ArrayList<Adversaire> listeAdversaire;
+
+    public ArrayList<Adversaire> getListePersonnage() {
+        return listeAdversaire;
+    }
+
+    public void setListePersonnage(ArrayList<Adversaire> listePersonnage) {
+        this.listeAdversaire = listePersonnage;
+    }
+
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("interface.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        Scene scene = new Scene(FXMLLoader.load(getClass().getResource("interface.fxml")),753, 844);
+        primaryStage.setTitle("Java-Arena");
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
 
     public static void main(String[] args) {
-        launch(args);
+
         String titre1 = " ____  _                                            _                   _              _                                                     ";
         String titre2 = "|  _ \\(_)                                          | |                 | |            | |                         /\\                         ";
         String titre3 = "| |_) |_  ___ _ ____   _____ _ __  _   _  ___    __| | __ _ _ __  ___  | | __ _       | | __ ___   ____ _ ______ /  \\   _ __ ___ _ __   __ _ ";
@@ -50,7 +64,7 @@ public class Main extends Application {
         //  [ ] TODO:
         //  [ ] TODO:
 
-        Item epee = new Item("Épée de Tranche-Boudin",0,0,0,0,0,0,3,0);
+        Item epee = new Item("Épée de Tranche-Boudin",3,0,0,0,0,0,5,0);
         Item armure = new Item("Cuirasse tachée de gras",0,0,0,-1,0,0,0,10);
         Joueur j = new Joueur("Jordan", new Statistiques(10,10,10,10,10,10));
 
@@ -58,12 +72,30 @@ public class Main extends Application {
         j.equiperObjet(armure);
         j.rafraichirStatsEquipement();
 
-        Adversaire a = new Adversaire("Peepoudou", new Statistiques(6,8,6,10,7,50));
+        j.seDeplacer(0,0);
+
+        Adversaire a0 = new Adversaire("Gobelin boitant", new Statistiques(10,5,6,10,7,11));
+        Adversaire a1 = new Adversaire("Orc suintant", new Statistiques(7,6,7,11,8,10));
+        Adversaire a2 = new Adversaire("Peepoudou", new Statistiques(2,1,25,4,0,2));
+
+        a0.seDeplacer(5,7);
+        a1.seDeplacer(6,7);
+        a2.seDeplacer(2,4);
+
+        listeAdversaire = new ArrayList<Adversaire>();
+
+        listeAdversaire.add(a0);
+        listeAdversaire.add(a1);
+        listeAdversaire.add(a2);
 
 
-        Combat c = new Combat(j,a);
+
+        Combat c = new Combat(j,listeAdversaire);
         c.start();
+        //launch(args);
 
 
     }
+
+
 }

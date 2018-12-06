@@ -1,5 +1,6 @@
 package content;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public abstract class Personnage {
@@ -10,6 +11,44 @@ public abstract class Personnage {
     private Statistiques statsDebase;
     private Equipement equipement;
     private Inventaire inventaire;
+    private int posX = 0;
+    private int posY = 0;
+    private String face;
+
+    public String getFace() {
+        return face;
+    }
+
+    public void setFace(String face) {
+        this.face = face;
+    }
+
+    public File getSkin() {
+        return skin;
+    }
+
+    public void setSkin(File skin) {
+        this.skin = skin;
+    }
+
+    private File skin;
+
+
+    public int getPosX() {
+        return posX;
+    }
+
+    public void setPosX(int posX) {
+        this.posX = posX;
+    }
+
+    public int getPosY() {
+        return posY;
+    }
+
+    public void setPosY(int posY) {
+        this.posY = posY;
+    }
 
     public Statistiques getStatsDebase() {
         return statsDebase;
@@ -94,11 +133,16 @@ public abstract class Personnage {
                 degats = (int) ((degats + this.jetForce()) * (1 - adversaire.getStats().getReductionDeDegats()));
 
                 adversaire.setHp(adversaire.getHp() - degats);
+                if(adversaire.getHp() < 0) {
+                    adversaire.setHp(0);
+                }
                 System.out.println("Ouch! " + this.getNom() + " inflige " + degats + " dégats à " + adversaire.getNom());
             }else {
                 System.out.println(this.getNom() + " rate son attaque!");
             }
         }
+
+
     }
 
 
@@ -207,8 +251,63 @@ public abstract class Personnage {
 
     }
 
+    public void seDeplacer(int dX, int dY){
+        this.posX += dX;
+        this.posY += dY;
+    }
+
+    public void seDeplacerVers(Personnage p) {
+        Combat.sleep(500);
+
+        if (this.posX < p.posX) {
+            this.seDeplacer(1, 0);
+        } else if (this.posX > p.posX) {
+            this.seDeplacer(-1, 0);
+        }
 
 
+        if (this.posY < p.posY - 1) {
+            this.seDeplacer(0, 1);
+        } else if (this.posY > p.posY + 1) {
+            this.seDeplacer(0, -1);
+        }
+    }
+
+    public boolean estAssezProchePourSeBattre(Personnage p){
+        if(Math.abs(this.posX - p.posX) == 0 && Math.abs(this.posY - p.posY) == 1) {
+            return true;
+        }else if(Math.abs(this.posX - p.posX) == 1 && Math.abs(this.posY - p.posY) == 0){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+    public boolean conflitPosition(Personnage a) {
+        if (this.getPosX() == a.getPosX() && this.getPosY() == a.getPosY()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean conflitPosition(Plateau p) {
+        if (this.getPosX() + 1 > p.getLongueur()) {
+            return true;
+        }
+        else if (this.getPosX() - 1 < 0) {
+            return true;
+        }
+        else if (this.getPosY() > p.getHauteur()) {
+            return true;
+        }
+        else if (this.getPosY() - 1 < 0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
 
 
 }
