@@ -45,7 +45,7 @@ public class Plateau {
         String[][] plateau = new String[longueur][hauteur];
         for (int x = 0; x < 12; x++) {
             for (int y = 0; y < 8; y++) {
-                plateau[x][y] = "   ";
+                plateau[x][y] = "░░";//█
             }
         }
 
