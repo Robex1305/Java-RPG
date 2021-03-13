@@ -1,6 +1,7 @@
 package content;
 
-import java.io.File;
+import javafx.scene.image.Image;
+
 
 public class Adversaire extends Personnage{
 
@@ -16,8 +17,9 @@ public class Adversaire extends Personnage{
 
     public Adversaire(String nom, Statistiques stats){
         super(nom, stats);
-        this.setSkin(new File("src\\img\\joueur.png"));
         this.setFace("*_*");
+        Image pic = new Image("./img/orcdefault.png");
+        this.setPicture(pic);
     }
 
     public int[] mouvementAleatoire() {
@@ -47,4 +49,34 @@ public class Adversaire extends Personnage{
         return new int[]{0,0};
     }
 
+    @Override
+    public void seDeplacer(int dX, int dY) {
+        super.seDeplacer(dX, dY);
+        if(getIsWalking() == 1){
+            Image pic = new Image("./img/orcdefault.png");
+            setPicture(pic);
+            setIsWalking(0);
+        }else{
+            Image pic = new Image("./img/orcsedeplace.png");
+            setPicture(pic);
+            setIsWalking(1);
+        }
+    }
+
+    @Override
+    public void attaque(Personnage adversaire) {
+        super.attaque(adversaire);
+
+
+        if (getIsAttacking() == 1) {
+            Image pic = new Image("./img/orcdefault.png");
+            setPicture(pic);
+            setIsAttacking(0);
+        } else {
+            Image pic = new Image("./img/orcattaque.png");
+            setPicture(pic);
+            setIsAttacking(1);
+        }
+
+    }
 }

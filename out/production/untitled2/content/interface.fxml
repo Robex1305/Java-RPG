@@ -1,31 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane prefHeight="747.0002999999924" prefWidth="753.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="content.Controller">
-  <children>
-    <GridPane fx:id="plateau" gridLinesVisible="true" layoutX="57.0" layoutY="57.0">
-      <columnConstraints>
-        <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
-        <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
-        <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
-        <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
-        <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
-        <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
-        <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
-        <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
-      </columnConstraints>
-      <rowConstraints>
-        <RowConstraints minHeight="80.0" prefHeight="80.0" />
-        <RowConstraints minHeight="80.0" prefHeight="80.0" />
-        <RowConstraints minHeight="80.0" prefHeight="80.0" />
-        <RowConstraints minHeight="80.0" prefHeight="80.0" />
-        <RowConstraints minHeight="80.0" prefHeight="80.0" />
-        <RowConstraints minHeight="80.0" prefHeight="80.0" />
-        <RowConstraints minHeight="80.0" prefHeight="80.0" />
-        <RowConstraints minHeight="80.0" prefHeight="80.0" />
-      </rowConstraints>
-    </GridPane>
-  </children>
-</Pane>
+
+<Pane fx:id="mainPane" prefHeight="747.0002999999924" prefWidth="753.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="content.Controller" />

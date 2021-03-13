@@ -1,5 +1,8 @@
 package content;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -14,6 +17,38 @@ public abstract class Personnage {
     private int posX = 0;
     private int posY = 0;
     private String face;
+    private ImageView picture;
+    private int isAttacking = 0;
+    private int isWalking = 0;
+
+    public int getIsAttacking() {
+        return isAttacking;
+    }
+
+    public void setIsAttacking(int isAttacking) {
+        this.isAttacking = isAttacking;
+    }
+
+    public int getIsWalking() {
+        return isWalking;
+    }
+
+    public void setIsWalking(int isWalking) {
+        this.isWalking = isWalking;
+    }
+
+    public ImageView getPicture() {
+        return picture;
+    }
+
+    public void setPicture(Image image){
+        this.picture = new ImageView();
+        this.picture.setFitWidth(120);
+        this.picture.setFitHeight(120);
+        this.picture.setImage(image);
+        this.picture.setLayoutX(this.posX);
+        this.picture.setLayoutY(this.posY);
+    }
 
     public String getFace() {
         return face;
@@ -118,6 +153,7 @@ public abstract class Personnage {
     }
 
 
+
     public void attaque(Personnage adversaire){
         int degats = this.getStats().getDegats().getValue();
         boolean jetChance = this.jetChance(adversaire);
@@ -128,7 +164,7 @@ public abstract class Personnage {
                 degats++;
                 if (jetChance) {
                     degats = (int) Math.round(degats * 2);
-                    System.out.print(">> Coup critique << ");
+
                 }
                 degats = (int) ((degats + this.jetForce()) * (1 - adversaire.getStats().getReductionDeDegats()));
 
@@ -136,9 +172,7 @@ public abstract class Personnage {
                 if(adversaire.getHp() < 0) {
                     adversaire.setHp(0);
                 }
-                System.out.println("Ouch! " + this.getNom() + " inflige " + degats + " dégats à " + adversaire.getNom());
-            }else {
-                System.out.println(this.getNom() + " rate son attaque!");
+
             }
         }
 
@@ -252,31 +286,33 @@ public abstract class Personnage {
     }
 
     public void seDeplacer(int dX, int dY){
-        this.posX += dX;
-        this.posY += dY;
+        this.posX += dX*5;
+        this.posY += dY*5;
+        this.picture.setLayoutX(this.posX);
+        this.picture.setLayoutY(this.posY);
     }
 
+
     public void seDeplacerVers(Personnage p) {
-        Combat.sleep(500);
+        int distX = p.posX - this.posX;
+        int distY = p.posY - this.posY;
+        int coefX = distX / Math.abs(distX);
+        int coefY = distY / Math.abs(distY);
 
-        if (this.posX < p.posX) {
-            this.seDeplacer(1, 0);
-        } else if (this.posX > p.posX) {
-            this.seDeplacer(-1, 0);
+        if(-30 < distX && distX < 30){
+            seDeplacer(0, coefY);
+        } else if(-30 < distY && distY < 30){
+            seDeplacer(coefX, 0);
+        } else{
+            seDeplacer(coefX, coefY);
         }
 
 
-        if (this.posY < p.posY - 1) {
-            this.seDeplacer(0, 1);
-        } else if (this.posY > p.posY + 1) {
-            this.seDeplacer(0, -1);
-        }
+
     }
 
     public boolean estAssezProchePourSeBattre(Personnage p){
-        if(Math.abs(this.posX - p.posX) == 0 && Math.abs(this.posY - p.posY) == 1) {
-            return true;
-        }else if(Math.abs(this.posX - p.posX) == 1 && Math.abs(this.posY - p.posY) == 0){
+        if(Math.abs(this.posX - p.posX) < 50 && Math.abs(this.posY - p.posY) < 50) {
             return true;
         }else{
             return false;
@@ -292,22 +328,7 @@ public abstract class Personnage {
         }
     }
 
-    public boolean conflitPosition(Plateau p) {
-        if (this.getPosX() + 1 > p.getLongueur()) {
-            return true;
-        }
-        else if (this.getPosX() - 1 < 0) {
-            return true;
-        }
-        else if (this.getPosY() > p.getHauteur()) {
-            return true;
-        }
-        else if (this.getPosY() - 1 < 0) {
-            return true;
-        }else{
-            return false;
-        }
-    }
+
 
 
 }

@@ -1,17 +1,29 @@
 package content;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javafx.scene.layout.Pane;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class Combat {
     private Joueur joueur;
-    private ArrayList<Adversaire> listeAdversaire;
+    private List<Adversaire> listeAdversaire;
+    private double arenaXlength;
+    private double arenaYlength;
+
+    public List<Personnage> getListePersonnage() {
+        List<Personnage> l = new ArrayList<Personnage>();
+        l.add(joueur);
+        l.addAll(listeAdversaire);
+        return l;
+
+    }
+
+    private ArrayList<Personnage> listePersonnage;
     private Adversaire adversaireFocus;
     private Personnage gagnant;
     private String statutCombat;
-    private Plateau plateau;
+    private int sleepTime;
 
     public Joueur getJoueur() {
         return joueur;
@@ -21,7 +33,7 @@ public class Combat {
         this.joueur = joueur;
     }
 
-    public ArrayList<Adversaire> getListeAdversaire() {
+    public List<Adversaire> getListeAdversaire() {
         return listeAdversaire;
     }
 
@@ -45,13 +57,6 @@ public class Combat {
         this.statutCombat = statutCombat;
     }
 
-    public Plateau getPlateau() {
-        return plateau;
-    }
-
-    public void setPlateau(Plateau plateau) {
-        this.plateau = plateau;
-    }
 
     public Personnage getGagnant() {
         return gagnant;
@@ -72,124 +77,113 @@ public class Combat {
             this.statut = s;
         }
 
-        public String getStatut(){
+        public String getStatut() {
             return this.statut;
         }
     }
 
 
-
     ///////////////////////////////////
     // INSTANCIE UNE NOUVELLE PARTIE //
     ///////////////////////////////////
-        //
-    public Combat(Joueur j, ArrayList<Adversaire> listeAdversaire){
+    //
+    public Combat(Joueur j, ArrayList<Adversaire> listeAdversaire, double arenaXlength, double arenaYlength) {
+        sleepTime = 20;
         Statut statut = Statut.EN_COURS;
 
-        this.plateau = new Plateau(12,8,j,listeAdversaire);
+        this.arenaXlength = arenaXlength;
+        this.arenaYlength = arenaYlength;
         this.joueur = j;
         this.listeAdversaire = listeAdversaire;
         this.gagnant = null;
         this.statutCombat = statut.getStatut();
+
+        for (Personnage p : getListePersonnage()) {
+            p.setPosX(50 + (int) (Math.random() * arenaXlength - 100));
+            p.setPosY(50 +(int) (Math.random() * arenaYlength - 100));
+        }
     }
 
+    public int getSleepTime() {
+        return sleepTime;
+    }
 
     ////////////////////////
     // COMMENCE LA PARTIE //
     ////////////////////////
-        //
+    //
     public void start() {
-        joueur.setFace("o_o");
         joueur.setHp(joueur.getHpmax());
 
         for (Adversaire a : listeAdversaire) {
             a.setHp(a.getHpmax());
         }
-
-        while (this.statutCombat != Statut.TERMINE.getStatut()) {
-            if (joueur.isKO()) {
-                System.out.println(joueur.getNom() + " est KO!");
-                break;
-            }
-
-            this.adversaireFocus = joueur.getEnnemiLePlusProche(listeAdversaire);
-
-
-            while (!joueur.estAssezProchePourSeBattre(adversaireFocus)) {
-                joueur.setFace("o_o");
-                //Si le joueur est sur une diagonale du monstre
-                if ((Math.abs(joueur.getPosX() - adversaireFocus.getPosX()) == 1) && (Math.abs(joueur.getPosY() - adversaireFocus.getPosY()) == 1)) {
-                    joueur.seDeplacer(adversaireFocus.getPosX() - joueur.getPosX(), 0);
-                } else {
-                    joueur.seDeplacerVers(adversaireFocus);
-                }
-
-                verifiePosition();
-                dessinePlateau();
-            }
-
-
-
-            this.adversaireFocus.setEstAttaque(true);
-
-            while (!adversaireFocus.isKO()) {
-                sleep(500);
-                System.out.println("--------------------------------");
-                lanceCombat("1");
-                joueur.setFace("ò.ó");
-
-
-                verifiePosition();
-
-                adversaireFocus.setFace(">.<");
-                if (joueur.isKO()) {
-                    joueur.setFace("x_x");
-                    break;
-                }
-                dessinePlateau();
-            }
-
-            adversaireFocus.setFace("x_x");
-            dessinePlateau();
-            System.out.println(joueur.getNom() + " a vaincu " + adversaireFocus.getNom());
-
-
-            listeAdversaire.remove(adversaireFocus);
-
-            if (listeAdversaire.isEmpty()) {
-                this.gagnant = joueur;
-                this.statutCombat = Statut.TERMINE.getStatut();
-                joueur.setFace("\\^o^/");
-                System.out.println(joueur.getNom() + " a vaincu tout les monstres!");
-                dessinePlateau();
-            }
-
-        }
     }
+
+    public void nextRound() {
+        if (this.statutCombat != Statut.TERMINE.getStatut()) {
+            if (this.adversaireFocus == null) {
+                this.adversaireFocus = joueur.getEnnemiLePlusProche(listeAdversaire);
+            }
+
+            if (!joueur.estAssezProchePourSeBattre(adversaireFocus)) {
+                joueur.seDeplacerVers(adversaireFocus);
+            } else {
+                joueur.attaque(adversaireFocus);
+                this.adversaireFocus.setEstAttaque(true);
+                if (!adversaireFocus.isKO()) {
+                    adversaireFocus.attaque(joueur);
+                } else {
+                    listeAdversaire.remove(adversaireFocus);
+                    this.adversaireFocus = null;
+                }
+            }
+
+            getListeAdversaire().forEach(a -> {
+                a.mouvementAleatoire();
+            });
+
+            if (listeAdversaire.isEmpty() ||joueur.isKO()) {
+                this.statutCombat = Statut.TERMINE.getStatut();
+            }
+        }
+
+    }
+
 
     private void verifiePosition() {
-        for (Adversaire a : listeAdversaire) {
-            int posXcache = a.getPosX();
-            int posYcache = a.getPosY();
-
-            a.mouvementAleatoire();
-
-            while (a.conflitPosition(joueur) || a.conflitPosition(plateau)) {
-                a.setPosX(posXcache);
-                a.setPosY(posYcache);
-                a.mouvementAleatoire();
-            }
-
-            /*for (Adversaire b : listeAdversaire) {
-                while (a.conflitPosition(b)) {
-                    a.setPosX(posXcache);
-                    a.setPosY(posYcache);
-                    a.mouvementAleatoire();
-                }
-            }*/
-        }
+//        for (Adversaire a : listeAdversaire) {
+//            int posXcache = a.getPosX();
+//            int posYcache = a.getPosY();
+//
+//            a.mouvementAleatoire();
+//
+//            while (a.conflitPosition(joueur) || conflitPosition(a)) {
+//                a.setPosX(posXcache);
+//                a.setPosY(posYcache);
+//                a.mouvementAleatoire();
+//            }
+//
+//
+//        }
     }
 
+    public boolean conflitPosition(Personnage p) {
+        if (p.getPosX() + 1 > arenaXlength) {
+            return true;
+        }
+        else if (p.getPosX() - 1 < 0) {
+            return true;
+        }
+        else if (p.getPosY() > arenaYlength) {
+            return true;
+        }
+        else if (p.getPosY() - 1 < 0) {
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     ///////////////////////////////////////////////
     // DEMANDE DU CHOIX AU JOUEUR VIA LA CONSOLE //
@@ -245,11 +239,11 @@ public class Combat {
         //
     public void lanceCombat(String choix){ //TODO: Développer une IA pour les adversaire, afin de varier les actions
         if(joueur.getStats().getVitesse().getValue() > adversaireFocus.getStats().getVitesse().getValue()){
-            action(choix);
+            joueur.attaque(adversaireFocus);
             adversaireFocus.attaque(joueur);
         }else{
             adversaireFocus.attaque(joueur);
-            action(choix);
+            joueur.attaque(adversaireFocus);
         }
     }
 
@@ -260,26 +254,6 @@ public class Combat {
             e.printStackTrace();
         }
     }
-    
-
-
-    public void dessinePlateau(){
-
-        System.out.println("--------------------------------");
-        System.out.println(joueur.getNom() + ": " + joueur.getHp() + "/" + joueur.getHpmax());
-        System.out.println(adversaireFocus.getNom() + ": " + adversaireFocus.getHp() + "/" + adversaireFocus.getHpmax());
-        System.out.println("--------------------------------");
-        this.plateau = new Plateau(12,8,joueur,listeAdversaire);
-        for(int x = 0; x< 12; x++){
-            for(int y = 0; y< 8; y++){
-                System.out.print(plateau.getPlateau()[x][y]);
-            }
-            System.out.println();
-        }
-        System.out.println("\n\n\n");
-
-    }
-
 
 
 }

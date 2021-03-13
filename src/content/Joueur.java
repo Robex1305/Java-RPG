@@ -1,17 +1,19 @@
 package content;
 
-import java.io.File;
-import java.util.ArrayList;
+import javafx.scene.image.Image;
+
+import java.util.List;
 
 public class Joueur extends Personnage{
 
     public Joueur(String nom, Statistiques stats){
 
         super(nom, stats);
-        this.setSkin(new File("src\\img\\joueur.png"));
+        Image pic = new Image("./img/default.png");
+        this.setPicture(pic);
     }
 
-    public Adversaire getEnnemiLePlusProche(ArrayList<Adversaire> listeAdversaire) {
+    public Adversaire getEnnemiLePlusProche(List<Adversaire> listeAdversaire) {
 
         Adversaire premierAdversaire = listeAdversaire.get(0);
         Adversaire lePlusProche = premierAdversaire;
@@ -33,5 +35,34 @@ public class Joueur extends Personnage{
         return lePlusProche;
     }
 
+    @Override
+    public void seDeplacer(int dX, int dY) {
+        super.seDeplacer(dX, dY);
+        if(getIsWalking() == 1){
+            Image pic = new Image("./img/default.png");
+            setPicture(pic);
+            setIsWalking(0);
+        }else{
+            Image pic = new Image("./img/sedeplace.png");
+            setPicture(pic);
+            setIsWalking(1);
+        }
+    }
 
+    @Override
+    public void attaque(Personnage adversaire) {
+        super.attaque(adversaire);
+
+
+        if (getIsAttacking() == 1) {
+            Image pic = new Image("./img/default.png");
+            setPicture(pic);
+            setIsAttacking(0);
+        } else {
+            Image pic = new Image("./img/attaque.png");
+            setPicture(pic);
+            setIsAttacking(1);
+        }
+
+    }
 }
